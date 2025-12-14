@@ -24,7 +24,7 @@ public class ReceitasDB {
     @Getter
     @Setter
     @AllArgsConstructor
-    @Embeddable // <-- ESSA ANOTAÇÃO PARA JPA
+    @Embeddable // <-- ESSA ANOTAÇÃO PARA JPA USADO PARA CRIAR UM ARRAY DE OBJETOS
     public static class Ingredient{
         private String item;
         private String quantity;
