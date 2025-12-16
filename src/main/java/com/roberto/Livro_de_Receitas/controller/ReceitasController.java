@@ -38,11 +38,12 @@ public class ReceitasController {
     }
 
     //CLASSE PARA RETORNAR A RECEITA PELO ID
+    //SEMPRE COLOCAR O ? DENTRO DO <> QUANDO COLOCAR TRATAMENTO DE EXCEÇÃO - ResponseEntity<?>
     @GetMapping("/{id}")
-    public ResponseEntity<ReceitasDB> buscarReceitaId(@PathVariable Long id) {
-        return receitasService.buscarPorId(id)              //BUSCA A RECEITA PELO ID
-                .map(ResponseEntity::ok)                    //CONFIRMA SE ACHOU A RECEITA COM OK
-                .orElse(ResponseEntity.notFound().build()); //SENÃO DIZ QUE NÃO ENCONTROU
+    public ResponseEntity<?> buscarReceitaId(@PathVariable Long id) { 
+        //TRY E CATCH NÃO É MAIS NECESSARIO PORQUE CRIAMOS O ARQUIVO DE EXCEÇÕES GLOBAIS
+        ReceitasDB receitasDB = receitasService.buscarPorId(id);
+        return ResponseEntity.ok(receitasDB);
     }
     
     //CLASSE PARA CRIAR AS RECEITAS
