@@ -40,7 +40,7 @@ public class ReceitasService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException
                 ("Receita não encontrada! ID: " + id)); // EXCEÇÃO ESPECIFICA CASO NÃO ENCONTRA O ID
 
-                
+
         // O SERVICE JÁ SABE O QUE PRECISA RETORNAR POR CAUSA DO CONSTRUTOR FEITO NO DTO
         return new ReceitasDTO(receita); 
     }
@@ -62,13 +62,3 @@ public class ReceitasService {
     }
 
 }
-
-
-    /*
-    // ESSE METODO É PARA BUSCAR DIRETO DO RECEITASDB
-    // CLASSE QUE BUSCA OS DADOS POR ID
-    public ReceitasDB buscarPorId(Long id){
-        return receitasRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException
-                ("Receita com ID "+id+" não encontrada!")); //CRIO A EXCEÇÃO SE NÃO ENCONTRAR A RECEITA
-    }*/
