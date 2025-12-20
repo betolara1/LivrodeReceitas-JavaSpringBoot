@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.roberto.Livro_de_Receitas.model.UsuariosDB;
-import com.roberto.Livro_de_Receitas.security.JwtUtil;
 import com.roberto.Livro_de_Receitas.service.UsuariosService;
 
 import java.util.Map;
@@ -37,8 +36,8 @@ public class AuthController {
 
         // CONDIÇÃO PARA VER SE O USUARIO EXISTE E A SENHA FOR IGUAL
         if (usuario.isPresent() && usuario.get().getPassword().equals(request.get("password"))){
-            String token = JwtUtil.generateToken(usuario.get().getUsername());
-            return ResponseEntity.ok(Map.of("token", token));
+            //String token = JwtUtil.generateToken(usuario.get().getUsername());
+            return ResponseEntity.ok(usuario);
         }
 
         return ResponseEntity.status(401).body("Credenciais invalidas");

@@ -202,8 +202,6 @@ src/main/java/com/roberto/Livro_de_Receitas/
 │   └── StandardErrorDTO.java
 ├── security/          # Configurações de segurança
 │   ├── SecurityConfig.java
-│   ├── JwtUtil.java
-│   └── JwtAuthFilter.java
 ├── exception/         # Tratamento de exceções
 │   ├── GlobalExceptionHandler.java
 │   └── RecursoNaoEncontradoException.java
