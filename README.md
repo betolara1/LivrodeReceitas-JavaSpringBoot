@@ -5,9 +5,9 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 ## 🚀 Tecnologias Utilizadas
 
 - **Java 17**
-- **Spring Boot 4.0.0**
+- **Spring Boot 4.0.0** (com spring-boot-starter-webmvc)
 - **Spring Security** - Autenticação e autorização
-- **JWT (JSON Web Token)** - Autenticação baseada em tokens
+- **JWT (JSON Web Token)** - Dependências incluídas (implementação em desenvolvimento)
 - **Spring Data JPA** - Persistência de dados
 - **PostgreSQL** - Banco de dados relacional
 - **H2 Database** - Banco de dados em memória para desenvolvimento
@@ -20,8 +20,10 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 ### Autenticação
 - ✅ Registro de novos usuários (`/auth/register`)
 - ✅ Login de usuários (`/auth/login`)
-- ✅ Autenticação baseada em JWT
+- ✅ Autenticação HTTP Basic com Spring Security
+- ✅ Codificação de senhas com BCrypt
 - ✅ Proteção de rotas com Spring Security
+- ⏳ Autenticação JWT (dependências incluídas, implementação em desenvolvimento)
 
 ### Receitas
 - ✅ Listar todas as receitas (`GET /api/receitas`)
@@ -30,10 +32,10 @@ Sistema de gerenciamento de receitas desenvolvido com Spring Boot, permitindo qu
 - ✅ Deletar receita (`DELETE /api/receitas/{id}`)
 
 ### Estrutura de Dados
-- **Usuários**: username, password
-- **Receitas**: título, descrição, tempo de preparo, dificuldade, temperatura, ingredientes, instruções
-- **Categorias**: sistema de categorização de receitas
-- **Favoritos**: sistema de favoritos para usuários
+- **Usuários**: id, username (único), password (codificado com BCrypt)
+- **Receitas**: id, título, descrição, tempo de preparo, dificuldade, temperatura, ingredientes (array de objetos), instruções (array de strings), usuário (relacionamento ManyToOne)
+- **Categorias**: modelo criado (id, nome, slug, isDefault, userID) - endpoints ainda não implementados
+- **Favoritos**: modelo criado (id, userID) - endpoints ainda não implementados
 
 ## 🛠️ Pré-requisitos
 
@@ -88,6 +90,10 @@ Ou execute a classe `LivroDeReceitasApplication.java` diretamente na sua IDE.
 
 A aplicação estará disponível em: `http://localhost:8080`
 
+### 6. Interface Frontend
+
+O projeto inclui uma interface HTML simples localizada em `src/main/resources/static/index.html` que permite testar as funcionalidades da API diretamente no navegador.
+
 ## 📡 Endpoints da API
 
 ### Autenticação
@@ -114,11 +120,18 @@ Content-Type: application/json
 }
 ```
 
-**Resposta:**
+**Resposta (sucesso):**
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "id": 1,
+  "username": "usuario123",
+  "password": "$2a$10$..."
 }
+```
+
+**Resposta (erro):**
+```json
+"Credenciais invalidas"
 ```
 
 ### Receitas
@@ -126,19 +139,61 @@ Content-Type: application/json
 #### Listar Todas as Receitas
 ```http
 GET /api/receitas
-Authorization: Bearer {token}
+Authorization: Basic {credenciais_base64}
+```
+
+**Resposta:**
+```json
+[
+  {
+    "id": 1,
+    "title": "Bolo de Chocolate",
+    "description": "Delicioso bolo de chocolate caseiro",
+    "ingredients": [
+      {
+        "item": "Farinha de trigo",
+        "quantity": "2 xícaras"
+      }
+    ],
+    "instructions": [
+      "Misture os ingredientes secos",
+      "Asse por 40 minutos"
+    ],
+    "usuario": "usuario123"
+  }
+]
 ```
 
 #### Buscar Receita por ID
 ```http
 GET /api/receitas/{id}
-Authorization: Bearer {token}
+Authorization: Basic {credenciais_base64}
+```
+
+**Resposta:**
+```json
+{
+  "id": 1,
+  "title": "Bolo de Chocolate",
+  "description": "Delicioso bolo de chocolate caseiro",
+  "ingredients": [
+    {
+      "item": "Farinha de trigo",
+      "quantity": "2 xícaras"
+    }
+  ],
+  "instructions": [
+    "Misture os ingredientes secos",
+    "Asse por 40 minutos"
+  ],
+  "usuario": "usuario123"
+}
 ```
 
 #### Criar Receita
 ```http
 POST /api/receitas
-Authorization: Bearer {token}
+Authorization: Basic {credenciais_base64}
 Content-Type: application/json
 
 {
@@ -165,17 +220,23 @@ Content-Type: application/json
 }
 ```
 
+**Nota**: O DTO retornado não inclui `prepTime`, `difficulty` e `temperature` (filtrados propositalmente para demonstrar o uso de DTOs).
+
 #### Deletar Receita
 ```http
 DELETE /api/receitas/{id}
-Authorization: Bearer {token}
+Authorization: Basic {credenciais_base64}
 ```
+
+**Resposta:** `204 No Content`
 
 ## 🔒 Segurança
 
-- As rotas de receitas (`/api/receitas/**`) são protegidas e requerem autenticação JWT
-- O token JWT deve ser enviado no header `Authorization: Bearer {token}`
+- As rotas de receitas (`/api/receitas/**`) são protegidas e requerem autenticação HTTP Basic
+- A autenticação HTTP Basic deve ser enviada no header `Authorization: Basic {credenciais_base64}`
 - As rotas de autenticação (`/auth/**`) são públicas
+- As senhas são codificadas usando BCrypt
+- **Nota**: As dependências JWT estão incluídas no projeto, mas a implementação completa ainda está em desenvolvimento
 
 ## 📁 Estrutura do Projeto
 
@@ -235,9 +296,13 @@ Se estiver usando H2, o console estará disponível em:
 ## 📝 Notas de Desenvolvimento
 
 - O projeto utiliza **DTOs** para transferência de dados, separando a camada de apresentação da camada de persistência
+  - O `ReceitasDTO` filtra propositalmente alguns campos (prepTime, difficulty, temperature) para demonstrar o uso de DTOs
 - **Lombok** é utilizado para reduzir código boilerplate (getters, setters, construtores)
 - O tratamento de exceções é feito globalmente através do `GlobalExceptionHandler`
-- A autenticação utiliza **JWT** para tokens stateless
+- A autenticação atual utiliza **HTTP Basic Auth** com BCrypt para codificação de senhas
+- As dependências JWT estão incluídas no projeto, mas a implementação completa ainda está em desenvolvimento
+- As receitas possuem relacionamento ManyToOne com usuários, permitindo rastrear o criador de cada receita
+- Os modelos `CategoriasDB` e `FavoritosDB` estão criados, mas os endpoints ainda não foram implementados
 
 ## 🤝 Contribuindo
 
